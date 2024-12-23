@@ -136,7 +136,8 @@ class QuestionnaireApp {
             }
 
             const reviewContent = document.getElementById('review-content');
-            reviewContent.innerHTML = marked.parse(data.summary);
+            // 使用 marked.parse 替代 marked
+            reviewContent.innerHTML = marked.parse ? marked.parse(data.summary) : marked(data.summary);
             
             // 在总结部分添加返回按钮
             const buttonContainer = document.createElement('div');
