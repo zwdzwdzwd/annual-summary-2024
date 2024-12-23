@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [],
+  "functions": {
+    "/api/questions": {
+      "function": "questions"
+    },
+    "/api/poster": {
+      "function": "poster"
+    }
+  }
+}
