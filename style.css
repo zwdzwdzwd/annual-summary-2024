@@ -70,8 +70,24 @@ button:hover {
 
 .button-group {
     display: flex;
-    justify-content: space-between;
-    margin-top: 1.5rem;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.button-group button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.button-group button:hover {
+    background-color: #45a049;
 }
 
 #progress {
@@ -101,17 +117,43 @@ textarea {
 }
 
 #summary-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
     margin: 2rem 0;
 }
 
 .formatted-content {
-    line-height: 1.8;
-    white-space: pre-line;
-    text-align: justify;
+    text-align: left;
+    line-height: 1.6;
+    margin-bottom: 2rem;
     padding: 1rem;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.formatted-content h1,
+.formatted-content h2,
+.formatted-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.formatted-content p {
+    margin-bottom: 1rem;
+    text-indent: 2em;
+}
+
+.formatted-content ul,
+.formatted-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2em;
+}
+
+.formatted-content li {
+    margin-bottom: 0.5rem;
 }
 
 .formatted-content br {
@@ -125,14 +167,9 @@ textarea {
     font-weight: 600;
 }
 
-.formatted-content ul, 
-.formatted-content ol {
-    margin: 1em 0;
-    padding-left: 2em;
-}
-
-.formatted-content li {
-    margin: 0.5em 0;
+#year-review,
+#future-outlook {
+    margin-bottom: 2rem;
 }
 
 #review-content,
@@ -180,21 +217,20 @@ textarea {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 1;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0,0,0,0.7);
 }
 
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
     padding: 20px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 800px;
+    border-radius: 10px;
+    max-width: 600px;
     position: relative;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -204,9 +240,7 @@ textarea {
     right: 20px;
     top: 10px;
     font-size: 28px;
-    font-weight: bold;
     cursor: pointer;
-    color: #666;
 }
 
 .close:hover {
@@ -214,15 +248,15 @@ textarea {
 }
 
 #poster-preview {
-    margin: 20px 0;
+    margin-top: 20px;
     text-align: center;
 }
 
 #poster-preview img {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 #download-poster-btn {
@@ -240,11 +274,4 @@ textarea {
 
 #share-btn:hover {
     background-color: #0077ed;
-}
-
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
 }

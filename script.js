@@ -16,12 +16,6 @@ class QuestionnaireApp {
         this.restartBtn = document.getElementById('restart-btn');
         this.loadingSection = document.getElementById('loading-section');
         
-        // 添加返回按钮
-        this.backBtn = document.createElement('button');
-        this.backBtn.textContent = '返回上一题';
-        this.backBtn.className = 'btn btn-secondary';
-        this.backBtn.style.marginRight = '10px';
-        
         this.loadQuestions();
         this.bindEvents();
     }
@@ -32,7 +26,6 @@ class QuestionnaireApp {
         this.nextBtn.addEventListener('click', () => this.handleNextQuestion());
         this.saveBtn.addEventListener('click', () => this.saveSummary());
         this.restartBtn.addEventListener('click', () => this.restart());
-        this.backBtn.addEventListener('click', () => this.showPreviousQuestion());
         document.getElementById('share-btn').addEventListener('click', () => this.generatePoster());
         document.querySelector('.close').addEventListener('click', () => {
             document.getElementById('poster-modal').style.display = 'none';
@@ -73,7 +66,7 @@ class QuestionnaireApp {
         this.answerInput.value = this.answers[this.currentQuestionIndex] || '';
         
         // Update button states
-        this.prevBtn.disabled = this.currentQuestionIndex === 0;
+        this.prevBtn.style.display = this.currentQuestionIndex === 0 ? 'none' : 'inline-block';
         this.nextBtn.textContent = this.currentQuestionIndex === this.questions.length - 1 ? '完成' : '下一题';
     }
 
@@ -136,14 +129,16 @@ class QuestionnaireApp {
             }
 
             const reviewContent = document.getElementById('review-content');
-            // 使用 marked.parse 替代 marked
-            reviewContent.innerHTML = marked.parse ? marked.parse(data.summary) : marked(data.summary);
+            const outlookContent = document.getElementById('outlook-content');
             
-            // 在总结部分添加返回按钮
-            const buttonContainer = document.createElement('div');
-            buttonContainer.style.marginTop = '20px';
-            buttonContainer.appendChild(this.backBtn);
-            reviewContent.parentElement.insertBefore(buttonContainer, reviewContent.nextSibling);
+            // 分割总结和展望部分
+            const parts = data.summary.split('# 未来展望');
+            const summary = parts[0];
+            const outlook = parts[1] || '';
+            
+            // 使用 marked.parse 渲染 Markdown
+            reviewContent.innerHTML = marked.parse ? marked.parse(summary) : marked(summary);
+            outlookContent.innerHTML = marked.parse ? marked.parse(outlook) : marked(outlook);
 
             this.loadingSection.classList.add('hidden');
             this.summarySection.classList.remove('hidden');
@@ -171,28 +166,37 @@ class QuestionnaireApp {
 
     async generatePoster() {
         try {
+            const summary = document.getElementById('review-content').innerText;
             const response = await fetch('/api/poster', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    url: window.location.href
+                    summary: summary
                 })
             });
 
+            if (!response.ok) {
+                throw new Error('生成海报失败');
+            }
+
             const data = await response.json();
             
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
             if (data.status === 'success') {
                 const posterPreview = document.getElementById('poster-preview');
                 posterPreview.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="分享海报">`;
                 document.getElementById('poster-modal').style.display = 'block';
             } else {
-                alert('生成海报失败，请稍后重试');
+                throw new Error('生成海报失败');
             }
         } catch (error) {
             console.error('Error generating poster:', error);
-            alert('生成海报时出现错误，请稍后重试');
+            alert('生成海报失败，请稍后重试');
         }
     }
 
