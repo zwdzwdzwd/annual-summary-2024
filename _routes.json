@@ -8,6 +8,10 @@
     },
     "/api/poster": {
       "function": "poster"
+    },
+    "/api/*": {
+      "function": "api",
+      "flags": ["nodejs_compat"]
     }
   }
 }
