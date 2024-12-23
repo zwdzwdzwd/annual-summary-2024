@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024年度总结生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="welcome-section" class="section">
+            <h1>2024年度总结生成器</h1>
+            <p>准备好回顾这一年了吗？点击下方按钮开始答题，让我们一起创作你的年度总结吧！</p>
+            <button id="start-btn">开始答题</button>
+        </div>
+
+        <div id="question-section" class="section hidden">
+            <div id="progress">
+                <div id="progress-bar"></div>
+            </div>
+            <h2 id="question-text"></h2>
+            <textarea id="answer-input" placeholder="在这里写下你的答案..."></textarea>
+            <div class="button-group">
+                <button id="prev-btn" class="hidden">上一题</button>
+                <button id="next-btn">下一题</button>
+            </div>
+        </div>
+
+        <div id="summary-section" class="section hidden">
+            <h2>你的2024年度总结</h2>
+            <div id="summary-content">
+                <div id="year-review">
+                    <h3>年度回顾</h3>
+                    <div id="review-content" class="formatted-content"></div>
+                </div>
+                <div id="future-outlook">
+                    <h3>未来展望</h3>
+                    <div id="outlook-content" class="formatted-content"></div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="save-btn">保存总结</button>
+                <button id="share-btn">生成分享海报</button>
+                <button id="restart-btn">重新开始</button>
+            </div>
+
+            <!-- 海报预览模态框 -->
+            <div id="poster-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>分享海报</h2>
+                    <div id="poster-preview"></div>
+                    <button id="download-poster-btn">保存海报</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-section" class="section hidden">
+            <div class="loader"></div>
+            <p>正在生成你的年度总结...</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
