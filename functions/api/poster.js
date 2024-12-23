@@ -21,43 +21,69 @@ export async function onRequest(context) {
   }
 
   try {
+    const { ImageResponse } = await import('@vercel/og');
     const body = await context.request.json();
     const { summary } = body;
 
     // 创建一个简单的海报
-    const canvas = new OffscreenCanvas(800, 1200);
-    const ctx = canvas.getContext('2d');
+    const image = new ImageResponse(
+      {
+        type: 'div',
+        props: {
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '800px',
+            height: '1200px',
+            backgroundColor: '#ffffff',
+            padding: '40px',
+          },
+          children: [
+            {
+              type: 'h1',
+              props: {
+                style: { fontSize: '48px', color: '#333333', marginBottom: '40px' },
+                children: '2024年度总结',
+              },
+            },
+            {
+              type: 'div',
+              props: {
+                style: {
+                  fontSize: '24px',
+                  color: '#666666',
+                  textAlign: 'left',
+                  lineHeight: '1.5',
+                  maxWidth: '600px',
+                },
+                children: summary.substring(0, 500) + '...',  // 限制文本长度
+              },
+            },
+            {
+              type: 'div',
+              props: {
+                style: {
+                  marginTop: '40px',
+                  fontSize: '20px',
+                  color: '#999999',
+                },
+                children: new Date().toLocaleDateString(),
+              },
+            },
+          ],
+        },
+      },
+      {
+        width: 800,
+        height: 1200,
+      }
+    );
 
-    // 设置背景
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 800, 1200);
-
-    // 添加标题
-    ctx.fillStyle = '#333333';
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('2024年度总结', 400, 100);
-
-    // 添加内容
-    ctx.font = '24px Arial';
-    ctx.textAlign = 'left';
-    const lines = summary.split('\n');
-    let y = 200;
-    for (const line of lines) {
-      if (y > 1100) break; // 防止内容溢出
-      ctx.fillText(line, 50, y);
-      y += 40;
-    }
-
-    // 添加日期
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText(new Date().toLocaleDateString(), 750, 1150);
-
-    // 将 canvas 转换为 blob
-    const blob = await canvas.convertToBlob();
-    const arrayBuffer = await blob.arrayBuffer();
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    // 将图片转换为 base64
+    const buffer = await image.arrayBuffer();
+    const base64Image = btoa(String.fromCharCode(...new Uint8Array(buffer)));
 
     return new Response(JSON.stringify({
       status: 'success',
@@ -71,7 +97,7 @@ export async function onRequest(context) {
   } catch (error) {
     console.error('Error generating poster:', error);
     return new Response(JSON.stringify({
-      error: '生成海报时出现错误'
+      error: '生成海报时出现错误: ' + error.message
     }), {
       status: 500,
       headers: {

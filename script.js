@@ -222,7 +222,7 @@ class QuestionnaireApp {
             this.answers = JSON.parse(savedAnswers);
         }
         
-        this.currentQuestionIndex = this.answers.length - 1;
+        this.currentQuestionIndex = 0;  
         this.summarySection.classList.add('hidden');
         this.questionSection.classList.remove('hidden');
         this.showQuestion();
