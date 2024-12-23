@@ -167,58 +167,45 @@ class QuestionnaireApp {
     async generatePoster() {
         try {
             const summary = document.getElementById('review-content').innerText;
-            const response = await fetch('/api/poster', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    summary: summary
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('生成海报失败');
-            }
-
-            const data = await response.json();
             
-            if (data.error) {
-                throw new Error(data.error);
-            }
+            // 生成二维码
+            const qr = qrcode(0, 'M');
+            qr.addData(window.location.href);
+            qr.make();
+            const qrImage = qr.createDataURL(10);  // 10 是像素大小
 
-            if (data.status === 'success') {
-                const posterPreview = document.getElementById('poster-preview');
-                posterPreview.innerHTML = `
+            const posterPreview = document.getElementById('poster-preview');
+            posterPreview.innerHTML = `
+                <div style="
+                    width: 800px;
+                    margin: 0 auto;
+                    padding: 40px;
+                    background: white;
+                    border: 1px solid #ccc;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                ">
                     <div style="
-                        width: 800px;
-                        margin: 0 auto;
-                        padding: 40px;
-                        background: white;
-                        border: 1px solid #ccc;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                        font-family: Arial, sans-serif;
-                        white-space: pre-wrap;
-                        line-height: 1.6;
+                        font-size: 32px;
+                        font-weight: bold;
+                        margin-bottom: 30px;
+                        color: #333;
+                    ">2024年度总结</div>
+                    <img src="${qrImage}" style="
+                        width: 200px;
+                        height: 200px;
+                        margin: 20px auto;
+                        display: block;
                     ">
-                        <div style="
-                            font-size: 32px;
-                            font-weight: bold;
-                            text-align: center;
-                            margin-bottom: 30px;
-                            color: #333;
-                        ">2024年度总结</div>
-                        <div style="
-                            font-size: 18px;
-                            color: #666;
-                            margin-bottom: 20px;
-                        ">${data.content}</div>
-                    </div>
-                `;
-                document.getElementById('poster-modal').style.display = 'block';
-            } else {
-                throw new Error('生成海报失败');
-            }
+                    <div style="
+                        font-size: 16px;
+                        color: #666;
+                        margin-top: 20px;
+                    ">扫描二维码，生成你的2024年度总结</div>
+                </div>
+            `;
+            document.getElementById('poster-modal').style.display = 'block';
         } catch (error) {
             console.error('Error generating poster:', error);
             alert('生成海报失败，请稍后重试');
