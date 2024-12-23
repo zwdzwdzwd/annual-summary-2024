@@ -7,6 +7,16 @@ compatibility_flags = ["nodejs_compat"]
 # 这里不要填写实际的 API key，在 Cloudflare 控制台设置
 OPENAI_API_KEY = ""
 
+[site]
+bucket = "."
+
+[build]
+command = ""
+upload.format = "service-worker"
+
+[functions]
+directory = "functions"
+
 [[routes]]
 pattern = "/api/questions"
 script = "api/questions.js"
@@ -14,7 +24,3 @@ script = "api/questions.js"
 [[routes]]
 pattern = "/api/poster"
 script = "api/poster.js"
-
-[build]
-command = ""
-upload.format = "service-worker"

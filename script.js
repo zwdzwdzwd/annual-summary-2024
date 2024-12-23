@@ -118,10 +118,16 @@ class QuestionnaireApp {
             const response = await fetch('/api/questions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({ answers: answersWithQuestions })
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || '生成总结时出现错误');
+            }
 
             const data = await response.json();
             
@@ -143,7 +149,7 @@ class QuestionnaireApp {
             
         } catch (error) {
             console.error('Error generating summary:', error);
-            alert('生成总结时出现错误，请稍后重试');
+            alert(error.message || '生成总结时出现错误，请稍后重试');
             this.loadingSection.classList.add('hidden');
             this.questionSection.classList.remove('hidden');
         }
