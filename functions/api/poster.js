@@ -24,71 +24,61 @@ export async function onRequest(context) {
     const body = await context.request.json();
     const { summary } = body;
 
-    // 创建一个简单的 SVG 海报
-    const width = 800;
-    const height = 1200;
-    const padding = 40;
-    const maxTextWidth = width - (padding * 2);
-
-    // 将文本分成多行
-    const words = summary.split(' ');
-    let lines = [];
-    let currentLine = '';
-    
-    for (const word of words) {
-      if ((currentLine + word).length * 14 < maxTextWidth) {  // 估算字符宽度
-        currentLine += (currentLine ? ' ' : '') + word;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-      }
-    }
-    if (currentLine) {
-      lines.push(currentLine);
-    }
-    
-    // 限制行数
-    lines = lines.slice(0, 15);
-    if (lines.length === 15) {
-      lines[14] += '...';
-    }
-
-    // 生成 SVG
-    const svg = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="white"/>
-        
-        <!-- 标题 -->
-        <text x="${width/2}" y="${padding + 40}" 
-              font-family="Arial" font-size="48" font-weight="bold" 
-              text-anchor="middle" fill="#333333">
-          2024年度总结
-        </text>
-
-        <!-- 内容 -->
-        ${lines.map((line, i) => `
-          <text x="${padding}" y="${padding + 120 + (i * 40)}"
-                font-family="Arial" font-size="24"
-                fill="#666666">
-            ${line}
-          </text>
-        `).join('')}
-
-        <!-- 日期 -->
-        <text x="${width - padding}" y="${height - padding}"
-              font-family="Arial" font-size="20"
-              text-anchor="end" fill="#999999">
-          ${new Date().toLocaleDateString()}
-        </text>
-      </svg>
+    // 创建一个简单的 HTML 海报
+    const html = `
+      <html>
+        <head>
+          <style>
+            body {
+              margin: 0;
+              padding: 40px;
+              width: 800px;
+              height: 1200px;
+              background: white;
+              font-family: Arial, sans-serif;
+              box-sizing: border-box;
+            }
+            .title {
+              font-size: 48px;
+              font-weight: bold;
+              color: #333;
+              text-align: center;
+              margin-bottom: 40px;
+            }
+            .content {
+              font-size: 24px;
+              color: #666;
+              line-height: 1.6;
+              white-space: pre-wrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 15;
+              -webkit-box-orient: vertical;
+            }
+            .date {
+              font-size: 20px;
+              color: #999;
+              text-align: right;
+              margin-top: 40px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="title">2024年度总结</div>
+          <div class="content">${summary}</div>
+          <div class="date">${new Date().toLocaleDateString()}</div>
+        </body>
+      </html>
     `;
 
-    // 将 SVG 转换为 base64
-    const base64Image = btoa(svg);
+    // 将 HTML 转换为 base64
+    const base64Html = btoa(html);
 
     return new Response(JSON.stringify({
       status: 'success',
-      image: base64Image
+      image: base64Html,
+      contentType: 'text/html'
     }), {
       headers: {
         'Content-Type': 'application/json',

@@ -189,8 +189,13 @@ class QuestionnaireApp {
 
             if (data.status === 'success') {
                 const posterPreview = document.getElementById('poster-preview');
-                // 使用 data:image/svg+xml 格式显示 SVG
-                posterPreview.innerHTML = `<img src="data:image/svg+xml;base64,${data.image}" alt="分享海报">`;
+                // 创建一个 iframe 来显示 HTML 海报
+                posterPreview.innerHTML = `
+                    <iframe
+                        srcdoc="${data.image}"
+                        style="width: 800px; height: 1200px; border: none; transform: scale(0.5); transform-origin: 0 0;"
+                    ></iframe>
+                `;
                 document.getElementById('poster-modal').style.display = 'block';
             } else {
                 throw new Error('生成海报失败');
