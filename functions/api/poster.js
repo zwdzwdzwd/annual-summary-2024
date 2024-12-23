@@ -21,69 +21,70 @@ export async function onRequest(context) {
   }
 
   try {
-    const { ImageResponse } = await import('@vercel/og');
     const body = await context.request.json();
     const { summary } = body;
 
-    // 创建一个简单的海报
-    const image = new ImageResponse(
-      {
-        type: 'div',
-        props: {
-          style: {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '800px',
-            height: '1200px',
-            backgroundColor: '#ffffff',
-            padding: '40px',
-          },
-          children: [
-            {
-              type: 'h1',
-              props: {
-                style: { fontSize: '48px', color: '#333333', marginBottom: '40px' },
-                children: '2024年度总结',
-              },
-            },
-            {
-              type: 'div',
-              props: {
-                style: {
-                  fontSize: '24px',
-                  color: '#666666',
-                  textAlign: 'left',
-                  lineHeight: '1.5',
-                  maxWidth: '600px',
-                },
-                children: summary.substring(0, 500) + '...',  // 限制文本长度
-              },
-            },
-            {
-              type: 'div',
-              props: {
-                style: {
-                  marginTop: '40px',
-                  fontSize: '20px',
-                  color: '#999999',
-                },
-                children: new Date().toLocaleDateString(),
-              },
-            },
-          ],
-        },
-      },
-      {
-        width: 800,
-        height: 1200,
-      }
-    );
+    // 创建一个简单的 SVG 海报
+    const width = 800;
+    const height = 1200;
+    const padding = 40;
+    const maxTextWidth = width - (padding * 2);
 
-    // 将图片转换为 base64
-    const buffer = await image.arrayBuffer();
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    // 将文本分成多行
+    const words = summary.split(' ');
+    let lines = [];
+    let currentLine = '';
+    
+    for (const word of words) {
+      if ((currentLine + word).length * 14 < maxTextWidth) {  // 估算字符宽度
+        currentLine += (currentLine ? ' ' : '') + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+    
+    // 限制行数
+    lines = lines.slice(0, 15);
+    if (lines.length === 15) {
+      lines[14] += '...';
+    }
+
+    // 生成 SVG
+    const svg = `
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="white"/>
+        
+        <!-- 标题 -->
+        <text x="${width/2}" y="${padding + 40}" 
+              font-family="Arial" font-size="48" font-weight="bold" 
+              text-anchor="middle" fill="#333333">
+          2024年度总结
+        </text>
+
+        <!-- 内容 -->
+        ${lines.map((line, i) => `
+          <text x="${padding}" y="${padding + 120 + (i * 40)}"
+                font-family="Arial" font-size="24"
+                fill="#666666">
+            ${line}
+          </text>
+        `).join('')}
+
+        <!-- 日期 -->
+        <text x="${width - padding}" y="${height - padding}"
+              font-family="Arial" font-size="20"
+              text-anchor="end" fill="#999999">
+          ${new Date().toLocaleDateString()}
+        </text>
+      </svg>
+    `;
+
+    // 将 SVG 转换为 base64
+    const base64Image = btoa(svg);
 
     return new Response(JSON.stringify({
       status: 'success',

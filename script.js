@@ -189,7 +189,8 @@ class QuestionnaireApp {
 
             if (data.status === 'success') {
                 const posterPreview = document.getElementById('poster-preview');
-                posterPreview.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="分享海报">`;
+                // 使用 data:image/svg+xml 格式显示 SVG
+                posterPreview.innerHTML = `<img src="data:image/svg+xml;base64,${data.image}" alt="分享海报">`;
                 document.getElementById('poster-modal').style.display = 'block';
             } else {
                 throw new Error('生成海报失败');
