@@ -1,4 +1,4 @@
-class AnnualSummary {
+class QuestionnaireApp {
     constructor() {
         this.questions = [];
         this.currentQuestionIndex = 0;
@@ -16,6 +16,12 @@ class AnnualSummary {
         this.restartBtn = document.getElementById('restart-btn');
         this.loadingSection = document.getElementById('loading-section');
         
+        // 添加返回按钮
+        this.backBtn = document.createElement('button');
+        this.backBtn.textContent = '返回上一题';
+        this.backBtn.className = 'btn btn-secondary';
+        this.backBtn.style.marginRight = '10px';
+        
         this.loadQuestions();
         this.bindEvents();
     }
@@ -26,17 +32,12 @@ class AnnualSummary {
         this.nextBtn.addEventListener('click', () => this.handleNextQuestion());
         this.saveBtn.addEventListener('click', () => this.saveSummary());
         this.restartBtn.addEventListener('click', () => this.restart());
+        this.backBtn.addEventListener('click', () => this.showPreviousQuestion());
         document.getElementById('share-btn').addEventListener('click', () => this.generatePoster());
         document.querySelector('.close').addEventListener('click', () => {
             document.getElementById('poster-modal').style.display = 'none';
         });
         document.getElementById('download-poster-btn').addEventListener('click', () => this.downloadPoster());
-        window.addEventListener('click', (event) => {
-            const modal = document.getElementById('poster-modal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
     }
 
     async loadQuestions() {
@@ -48,6 +49,7 @@ class AnnualSummary {
             this.questions = this.shuffleArray(this.questions).slice(0, 20);
         } catch (error) {
             console.error('Error loading questions:', error);
+            alert('加载问题失败，请刷新页面重试');
         }
     }
 
@@ -109,6 +111,10 @@ class AnnualSummary {
                 answer: this.answers[i]
             }));
 
+            // 在生成总结前，保存问题和答案到 sessionStorage
+            sessionStorage.setItem('questions', JSON.stringify(this.questions));
+            sessionStorage.setItem('answers', JSON.stringify(this.answers));
+
             const response = await fetch('/api/questions', {
                 method: 'POST',
                 headers: {
@@ -123,8 +129,15 @@ class AnnualSummary {
                 throw new Error(data.error);
             }
 
-            document.getElementById('review-content').innerHTML = marked.parse(data.summary);
+            const reviewContent = document.getElementById('review-content');
+            reviewContent.innerHTML = marked.parse(data.summary);
             
+            // 在总结部分添加返回按钮
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.marginTop = '20px';
+            buttonContainer.appendChild(this.backBtn);
+            reviewContent.parentElement.insertBefore(buttonContainer, reviewContent.nextSibling);
+
             this.loadingSection.classList.add('hidden');
             this.summarySection.classList.remove('hidden');
             
@@ -189,14 +202,23 @@ class AnnualSummary {
     }
 
     restart() {
-        this.currentQuestionIndex = 0;
-        this.answers = [];
+        // 从 sessionStorage 恢复之前的答案
+        const savedQuestions = sessionStorage.getItem('questions');
+        const savedAnswers = sessionStorage.getItem('answers');
+        
+        if (savedQuestions && savedAnswers) {
+            this.questions = JSON.parse(savedQuestions);
+            this.answers = JSON.parse(savedAnswers);
+        }
+        
+        this.currentQuestionIndex = this.answers.length - 1;
         this.summarySection.classList.add('hidden');
-        this.startBtn.classList.remove('hidden');
+        this.questionSection.classList.remove('hidden');
+        this.showQuestion();
     }
 }
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    new AnnualSummary();
+    new QuestionnaireApp();
 });

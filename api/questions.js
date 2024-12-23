@@ -5,6 +5,18 @@ export async function onRequestPost(context) {
   // OpenAI API configuration
   const OPENAI_API_KEY = context.env.OPENAI_API_KEY;
   
+  if (!OPENAI_API_KEY) {
+    return new Response(JSON.stringify({
+      error: "OpenAI API key not configured"
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  }
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -29,7 +41,17 @@ export async function onRequestPost(context) {
       })
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
+
     const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response from OpenAI API');
+    }
+
     return new Response(JSON.stringify({
       summary: data.choices[0].message.content
     }), {
@@ -39,7 +61,10 @@ export async function onRequestPost(context) {
       }
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('Error in questions API:', error);
+    return new Response(JSON.stringify({
+      error: `生成总结时出现错误: ${error.message}`
+    }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
