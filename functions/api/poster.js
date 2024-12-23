@@ -24,61 +24,23 @@ export async function onRequest(context) {
     const body = await context.request.json();
     const { summary } = body;
 
-    // 创建一个简单的 HTML 海报
-    const html = `
-      <html>
-        <head>
-          <style>
-            body {
-              margin: 0;
-              padding: 40px;
-              width: 800px;
-              height: 1200px;
-              background: white;
-              font-family: Arial, sans-serif;
-              box-sizing: border-box;
-            }
-            .title {
-              font-size: 48px;
-              font-weight: bold;
-              color: #333;
-              text-align: center;
-              margin-bottom: 40px;
-            }
-            .content {
-              font-size: 24px;
-              color: #666;
-              line-height: 1.6;
-              white-space: pre-wrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              display: -webkit-box;
-              -webkit-line-clamp: 15;
-              -webkit-box-orient: vertical;
-            }
-            .date {
-              font-size: 20px;
-              color: #999;
-              text-align: right;
-              margin-top: 40px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="title">2024年度总结</div>
-          <div class="content">${summary}</div>
-          <div class="date">${new Date().toLocaleDateString()}</div>
-        </body>
-      </html>
-    `;
+    // 处理文本内容
+    const lines = summary.split('\n').filter(line => line.trim());
+    const processedSummary = lines.slice(0, 10).join('\n'); // 只取前10行
 
-    // 将 HTML 转换为 base64
-    const base64Html = btoa(html);
+    // 创建一个简单的文本海报
+    const posterContent = `
+2024年度总结
+—————————————
+
+${processedSummary}
+
+${new Date().toLocaleDateString()}
+    `.trim();
 
     return new Response(JSON.stringify({
       status: 'success',
-      image: base64Html,
-      contentType: 'text/html'
+      content: posterContent
     }), {
       headers: {
         'Content-Type': 'application/json',

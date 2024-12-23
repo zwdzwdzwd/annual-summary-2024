@@ -189,12 +189,31 @@ class QuestionnaireApp {
 
             if (data.status === 'success') {
                 const posterPreview = document.getElementById('poster-preview');
-                // 创建一个 iframe 来显示 HTML 海报
                 posterPreview.innerHTML = `
-                    <iframe
-                        srcdoc="${data.image}"
-                        style="width: 800px; height: 1200px; border: none; transform: scale(0.5); transform-origin: 0 0;"
-                    ></iframe>
+                    <div style="
+                        width: 800px;
+                        margin: 0 auto;
+                        padding: 40px;
+                        background: white;
+                        border: 1px solid #ccc;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        font-family: Arial, sans-serif;
+                        white-space: pre-wrap;
+                        line-height: 1.6;
+                    ">
+                        <div style="
+                            font-size: 32px;
+                            font-weight: bold;
+                            text-align: center;
+                            margin-bottom: 30px;
+                            color: #333;
+                        ">2024年度总结</div>
+                        <div style="
+                            font-size: 18px;
+                            color: #666;
+                            margin-bottom: 20px;
+                        ">${data.content}</div>
+                    </div>
                 `;
                 document.getElementById('poster-modal').style.display = 'block';
             } else {
